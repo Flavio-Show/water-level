@@ -1,26 +1,48 @@
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
-import NextAuth from "next-auth";
-import { prisma } from "@/lib/prisma";
+import { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { prisma } from './prisma';
+import { compare } from 'bcryptjs';
+import { JWT } from 'next-auth/jwt';
 
-export const authOptions: NextAuthOptions = {
+declare module 'next-auth' {
+  interface User {
+    id: string;
+    email: string;
+    name?: string;
+    isAdmin: boolean;
+    role: string;
+  }
+
+  interface Session {
+    user: User;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    isAdmin: boolean;
+    role: string;
+  }
+}
+
+export const  authOptions: NextAuthOptions = {
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: 'credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Senha', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email e senha são obrigatórios");
+          return null;
         }
 
         const user = await prisma.user.findUnique({
@@ -30,13 +52,13 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          throw new Error("Usuário não encontrado");
+          return null;
         }
 
         const isPasswordValid = await compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error("Senha inválida");
+          return null;
         }
 
         return {
@@ -74,7 +96,4 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST }; 
+}; 

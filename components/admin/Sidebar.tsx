@@ -8,7 +8,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Home, Users, Plus, Menu, X, Settings } from 'lucide-react';
+import { Home, Users, Plus, Menu, X, Settings, LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
 
 interface SidebarProps {
@@ -116,9 +116,19 @@ export default function Sidebar({ onUserCreated, isOpen, onToggle, session }: Si
                 <span>Sistemas</span>
               </Link>
             </nav>
+            <div className="mt-auto">
+          
+          <Link
+            href="/api/auth/signout"
+            className="flex items-center space-x-2 p-2 rounded-lg gap-2"
+          >
+            <LogOut size={20} />
+            Sair
+          </Link>
+        </div>
           </div>
 
-          <div className="mt-auto p-4">
+          {/* <div className="mt-auto p-4">
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
               <DrawerTrigger asChild>
                 <Button className="w-full">
@@ -183,7 +193,8 @@ export default function Sidebar({ onUserCreated, isOpen, onToggle, session }: Si
                 </form>
               </DrawerContent>
             </Drawer>
-          </div>
+          </div> */}
+          
         </div>
       </div>
 

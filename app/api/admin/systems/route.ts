@@ -13,17 +13,17 @@ async function checkAdmin(session: any) {
       email: session.user.email,
     },
     select: {
-      isAdmin: true,
+      role: true,
     },
   });
 
-  return adminUser?.isAdmin || false;
+  return adminUser?.role === 'ADMIN'?true: false;
 }
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-
+    console.log(session);
     if (!session) {
       return new NextResponse('Não autorizado', { status: 401 });
     }

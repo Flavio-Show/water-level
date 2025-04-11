@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,19 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      if (session?.user?.isAdmin) {
+        console.log(session.user.isAdmin);
+        
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,15 +43,6 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError(result.error);
-      } else {
-        // Verificar se o usuário é admin
-        const adminCheck = await fetch('/api/admin/check-admin');
-        if (adminCheck.ok) {
-          router.push('/admin');
-        } else {
-          router.push('/');
-        }
-        router.refresh();
       }
     } catch (error) {
       setError('Ocorreu um erro ao fazer login');

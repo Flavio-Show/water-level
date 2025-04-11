@@ -16,8 +16,8 @@ interface SystemInfo {
   cpuUsage: number;
 }
 
-export default function AdminDashboard() {
-  const { data: session, status } = useSession();
+export default  function AdminDashboard() {
+  const { data: session, status } =  useSession();
   const router = useRouter();
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6 w-full bg-blue-500">
+    <div className="p-6 space-y-6 w-fullbg-blue-500">
       <h1 className="text-3xl font-bold">Dashboard Admin</h1>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

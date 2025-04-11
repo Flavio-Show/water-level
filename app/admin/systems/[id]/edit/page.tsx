@@ -16,19 +16,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface System {
+  id: string;
+  pointName: string;
+  level: number;
+  hourly: string;
+  CriticalLevel: boolean;
+  LowLevel: boolean;
+  userId: string;
+}
+
 interface User {
   id: string;
   name: string;
   email: string;
 }
 
-export default function NewSystemPage() {
+export default function EditSystemPage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [users, setUsers] = useState<User[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<System>({
+    id: '',
     pointName: '',
     level: 0,
     hourly: '',
@@ -38,22 +49,43 @@ export default function NewSystemPage() {
   });
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/admin/users');
-        if (!response.ok) {
+        // Fetch users
+        const usersResponse = await fetch('/api/admin/users');
+        if (!usersResponse.ok) {
           throw new Error('Erro ao carregar usuários');
         }
-        const data = await response.json();
-        setUsers(data);
+        const usersData = await usersResponse.json();
+        setUsers(usersData);
+
+        // Fetch system
+        const systemResponse = await fetch(`/api/admin/systems/${params.id}`);
+        if (!systemResponse.ok) {
+          throw new Error('Erro ao carregar sistema');
+        }
+        const systemData = await systemResponse.json();
+        setFormData({
+          id: systemData.id,
+          pointName: systemData.pointName,
+          level: systemData.level,
+          hourly: systemData.hourly,
+          CriticalLevel: systemData.CriticalLevel,
+          LowLevel: systemData.LowLevel,
+          userId: systemData.userId,
+        });
       } catch (error) {
         console.error('Erro:', error);
-        setError('Erro ao carregar usuários');
+        setError('Erro ao carregar dados');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchUsers();
-  }, []);
+    if (params.id) {
+      fetchData();
+    }
+  }, [params.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,29 +93,36 @@ export default function NewSystemPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/admin/systems', {
-        method: 'POST',
+      const response = await fetch(`/api/admin/systems/${params.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          pointName: formData.pointName,
+          level: formData.level,
+          hourly: formData.hourly,
+          CriticalLevel: formData.CriticalLevel,
+          LowLevel: formData.LowLevel,
+          userId: formData.userId,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao criar sistema');
+        throw new Error(errorData.message || 'Erro ao atualizar sistema');
       }
 
       router.push('/admin/systems');
     } catch (error) {
-      console.error('Erro ao criar:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao criar sistema');
+      console.error('Erro ao atualizar:', error);
+      setError(error instanceof Error ? error.message : 'Erro ao atualizar sistema');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (status === 'loading') {
+  if (status === 'loading' || isLoading) {
     return <div>Carregando...</div>;
   }
 
@@ -92,7 +131,7 @@ export default function NewSystemPage() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Criar Novo Sistema</CardTitle>
+            <CardTitle>Editar Sistema</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -183,7 +222,7 @@ export default function NewSystemPage() {
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Criando...' : 'Criar Sistema'}
+                  {isLoading ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>
             </form>

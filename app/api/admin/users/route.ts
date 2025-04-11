@@ -14,11 +14,11 @@ async function checkAdmin(session: any) {
       email: session.user.email,
     },
     select: {
-      isAdmin: true,
+      role: true,
     },
   });
 
-  return adminUser?.isAdmin || false;
+  return adminUser?.role === 'ADMIN' ? true : false;
 }
 
 export async function GET() {
@@ -39,7 +39,7 @@ export async function GET() {
         id: true,
         name: true,
         email: true,
-        isAdmin: true,
+        role: true,
         createdAt: true,
       },
       orderBy: {
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         name,
         email,
         password: hashedPassword,
-        isAdmin: newUserIsAdmin,
+        role: newUserIsAdmin,
       },
     });
 
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       id: user.id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin,
+      isAdmin: user.role,
     });
   } catch (error) {
     console.error('Erro ao criar usuário:', error);

@@ -1,31 +1,37 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 import Navbar from "@/components/Navbar";
-import { Providers } from "./providers";
-import AuthProvider from "@/components/providers/SessionProvider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Water Level",
-  description: "Monitoramento de nível de água",
+  title: "Water Level - Monitoramento de Nível",
+  description: "Sistema de monitoramento de nível de água",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  
+
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
-        <AuthProvider>
-          <Providers>
-            <Navbar />
-            {children}
-          </Providers>
-        </AuthProvider>
+        <Providers>
+          <div className="flex min-h-screen">
+            {session?.user?.isAdmin ===false? <Navbar /> : null}
+            <main className={`flex-1 ${session?.user?.isAdmin ===false ? 'md:ml-64' : ''} p-4`}>
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

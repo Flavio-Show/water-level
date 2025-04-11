@@ -10,19 +10,20 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
     const systems = await prisma.system.findMany({
-      where: {
-        user: {
-          email: session.user.email
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: 30
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
     });
 
     const uptime = os.uptime();
@@ -44,9 +45,9 @@ export async function GET() {
       cpuUsage,
     });
   } catch (error) {
-    console.error('Erro ao obter informações do sistema:', error);
+    console.error('Erro ao buscar sistemas:', error);
     return NextResponse.json(
-      { error: 'Erro ao obter informações do sistema' },
+      { error: 'Erro ao buscar sistemas' },
       { status: 500 }
     );
   }

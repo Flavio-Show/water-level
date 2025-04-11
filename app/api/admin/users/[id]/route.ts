@@ -13,11 +13,11 @@ async function checkAdmin(session: any) {
       email: session.user.email,
     },
     select: {
-      isAdmin: true,
+      role: true,
     },
   });
 
-  return adminUser?.isAdmin || false;
+  return adminUser?.role === 'ADMIN' ? true : false;
 }
 
 export async function PUT(
@@ -49,13 +49,13 @@ export async function PUT(
       data: {
         name,
         email,
-        isAdmin: newIsAdmin,
+        role: newIsAdmin,
       },
       select: {
         id: true,
         name: true,
         email: true,
-        isAdmin: true,
+        role: true,
         createdAt: true,
       },
     });

@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Sidebar from '@/components/admin/Sidebar';
 import Navbar from '@/components/Navbar';
 
-export default function AdminLayout({
+export default   function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -49,7 +49,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div  className="min-h-screen flex flex-col">
       
       <div className="flex h-screen">
         <Sidebar 
