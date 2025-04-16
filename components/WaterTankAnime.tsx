@@ -11,7 +11,7 @@ interface WaterTankProps {
 
 export default function WaterTank({ level, className }: WaterTankProps) {
   const waterRef = useRef<HTMLDivElement>(null);
-
+console.log("level", level);
   useEffect(() => {
     if (waterRef.current) {
       const height = Math.min(Math.max(level, 0), 100);
@@ -42,16 +42,7 @@ export default function WaterTank({ level, className }: WaterTankProps) {
         ))}
       </div>
 
-      {/* Indicador de nível atual e horário */}
-      <div className="absolute -top-12 left-0 right-0 flex flex-col items-center gap-1">
-        <div className="bg-white px-2 py-1 rounded text-xs font-bold shadow">
-          {Math.round(level)}%
-        </div>
-        <div className="bg-white px-2 py-1 rounded text-xs font-bold shadow">
-          {new Date().toLocaleTimeString()}
-        </div>
-      </div>
-
+      
       {/* Indicador visual do nível atual */}
       <div 
         className="absolute left-0 right-0 h-0.5  transition-all duration-500 ease-in-out"

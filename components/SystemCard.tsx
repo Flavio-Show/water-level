@@ -57,10 +57,7 @@ export default function SystemCard({ system }: SystemCardProps) {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center ">
-        <div className="flex items-center ">
-          <WaterTank level={currentLevel} />
-          </div>
-          <div className="space-x-2 flex flex-col pb-2">
+        <div className="space-x-2 flex flex-col pb-2">
             <p className="text-base text-muted-foreground">
              Horário: {system.hourly}
             </p>
@@ -68,6 +65,10 @@ export default function SystemCard({ system }: SystemCardProps) {
              Nível: {system.level}%
             </p>
           </div>
+        <div className="flex items-center ">
+          <WaterTank  level={system.level} />
+          </div>
+          
          
           
         </div>
